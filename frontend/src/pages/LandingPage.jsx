@@ -76,6 +76,7 @@ const LandingPage = () => {
           >
             Stop losing revenue to customer churn. ChurnAlert AI uses autonomous agents to analyze behavioral signals and automate high-touch retention strategies.
           </motion.p>
+          <p className="text-sm text-slate-400 mt-2">Demo project: all companies shown are sample data.</p>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -251,9 +252,9 @@ const LandingPage = () => {
 
           <div className="relative z-10">
             <h3 className="text-4xl lg:text-6xl font-black text-white tracking-tight mb-8">Ready to transform your <br />retention strategy?</h3>
-            <p className="text-slate-400 text-lg mb-12 max-w-xl mx-auto">Join 500+ companies using ChurnAlert AI to protect their revenue and grow customer lifetime value.</p>
+            <p className="text-slate-400 text-lg mb-12 max-w-xl mx-auto">Try the live demo. All companies shown are sample data for this capstone project.</p>
             <Link to="/signup" className="inline-flex px-12 py-6 bg-white text-slate-900 rounded-2xl font-black hover:bg-slate-50 transition-all shadow-xl shadow-white/10">
-              Start Your Free Trial
+              Launch Demo
             </Link>
           </div>
         </div>
@@ -269,7 +270,7 @@ const LandingPage = () => {
             <span className="text-xl font-black tracking-tighter text-slate-900">ChurnAlert <span className="text-indigo-600">AI</span></span>
           </div>
 
-          <p className="text-slate-400 text-sm font-medium">© 2026 ChurnAlert AI Inc. Built for the future of SaaS.</p>
+          <p className="text-slate-400 text-sm font-medium">© 2026 ChurnAlert AI, a capstone project.</p>
 
           <div className="flex gap-6 text-sm font-bold text-slate-500">
             <span>ChurnAlert AI © 2026</span>

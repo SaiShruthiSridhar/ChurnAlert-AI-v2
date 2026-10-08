@@ -2,6 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base
 import os
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(env_path) if os.path.exists(env_path) else load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",

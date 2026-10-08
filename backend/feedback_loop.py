@@ -25,7 +25,11 @@ def run_feedback_loop(fired_rules=None):
             if w:
                 w.weight = min(2.0, round(w.weight * 1.05, 4))
                 w.last_adjusted = datetime.datetime.utcnow()
-        db.commit()
+        try:
+            from rules_engine import invalidate_rules_cache
+            invalidate_rules_cache()
+        except Exception:
+            pass
         print(f"[Feedback Loop] Boosted weights for {len(fired_rules)} fired rules: {fired_rules}")
     else:
         print("[Feedback Loop] No fired_rules provided — skipping weight adjustment.")

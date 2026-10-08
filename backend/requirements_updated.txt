@@ -87,6 +87,7 @@ pandas==2.3.3
 pinecone==9.0.1
 propcache==0.5.2
 protobuf==6.33.6
+psycopg2-binary==2.9.12
 pybase64==1.4.3
 pydantic==2.13.4
 pydantic-settings==2.14.1
@@ -131,5 +132,3 @@ xxhash==3.7.0
 yarl==1.24.2
 zipp==4.1.0
 zstandard==0.25.0
-psycopg2-binary==2.9.9
-mcp==1.9.4

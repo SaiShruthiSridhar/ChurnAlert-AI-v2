@@ -71,8 +71,30 @@ def seed():
         db.flush()
         
         # Initial risk calculation
-        score, tier, reasons, fired_rules = calculate_risk(account)
-        risk = RiskScore(account_id=account.id, score=score, tier=tier, reasons=reasons)
+        account_dict = {
+            'id': account.id,
+            'name': account.name,
+            'tenure': account.tenure,
+            'monthly_charges': account.monthly_charges,
+            'contract_type': account.contract_type,
+            'assigned_csm': account.assigned_csm,
+            'last_login_date': str(account.last_login_date) if account.last_login_date else None,
+            'renewal_date': str(account.renewal_date) if account.renewal_date else None,
+            'contract_value': account.contract_value,
+            'usage_metrics': [{
+                'login_frequency': u.login_frequency,
+                'feature_adoption_pct': u.feature_adoption_pct,
+                'session_duration_avg': u.session_duration_avg
+            } for u in account.usage_metrics],
+            'support_tickets': [{
+                'subject': t.subject,
+                'sentiment': t.sentiment,
+                'is_resolved': t.is_resolved
+            } for t in account.support_tickets]
+        }
+        score, tier, reasons, fired_rules = calculate_risk(account_dict)
+        reasons_str = '; '.join(reasons) if isinstance(reasons, list) else str(reasons)
+        risk = RiskScore(account_id=account.id, score=score, tier=tier, reasons=reasons_str)
         db.add(risk)
 
     db.commit()

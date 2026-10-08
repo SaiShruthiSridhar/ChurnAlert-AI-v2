@@ -6,11 +6,22 @@ __pycache__/
 *.pyw
 *.pyc
 
+# Environment Files
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+backend/.env
+frontend/.env
+
 # Virtual Environment
 env/
 venv/
-.env
-.env.local
+.venv/
+**/env/
+**/venv/
+**/.venv/
 
 # SQLite Databases
 *.db
@@ -19,9 +30,19 @@ venv/
 
 # Node
 node_modules/
+**/node_modules/
 dist/
+**/dist/
 build/
 .DS_Store
+
+# Patch and Dump Files
+changes.patch
+*.patch
+all_backend.txt
+backend/all_backend.txt
+ChurnAlert_AI_Full_Files_Export.txt
+*_Full_Files_Export.txt
 
 # Logs
 *.log

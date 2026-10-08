@@ -67,7 +67,7 @@ function Dashboard() {
     setNotifications(realNotifications);
   }, [accounts]);
 
-  const filteredAccounts = accounts.filter(acc => 
+  const filteredAccounts = accounts.filter(acc =>
     acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     acc.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     acc.assigned_csm.toLowerCase().includes(searchQuery.toLowerCase())
@@ -90,19 +90,19 @@ function Dashboard() {
         ? `${API_BASE}/accounts?source=hubspot`
         : `${API_BASE}/accounts`;
       const response = await axios.get(url);
-      
+
       const tierOrder = { 'HIGH': 0, 'MEDIUM': 1, 'LOW': 2 };
       const sorted = [...response.data].sort((a, b) => {
         const aTier = tierOrder[a.risk_tier] ?? 3;
         const bTier = tierOrder[b.risk_tier] ?? 3;
         return aTier - bTier;
       });
-      
+
       setAccounts(sorted)
       setLoading(false)
     } catch (error) {
       console.error("Error fetching accounts:", error)
-      setError("Failed to fetch accounts. Is the backend running?")
+      if (dataSource) setError("Failed to fetch accounts. Is the backend running?")
       setLoading(false)
     }
   }
@@ -174,7 +174,7 @@ function Dashboard() {
   };
 
   const toggleSetting = (id) => {
-    setSystemSettings(prev => prev.map(s => 
+    setSystemSettings(prev => prev.map(s =>
       s.id === id ? { ...s, active: !s.active } : s
     ));
   };
@@ -384,9 +384,9 @@ function Dashboard() {
               </div>
               <div>
                 <h1 className="text-2xl font-black tracking-tighter text-slate-900 leading-none mb-1">
-                  ChurnAlert <span className="text-indigo-600">Pro</span>
+                  ChurnAlert <span className="text-indigo-600">AI</span>
                 </h1>
-                <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Autonomous Agent v2.0</p>
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">Customer Retention Workflow</p>
               </div>
             </Link>
 
@@ -414,9 +414,9 @@ function Dashboard() {
 
             <div className="hidden xl:flex items-center bg-white border border-slate-100 rounded-2xl px-4 py-2 w-96 shadow-sm focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-400 transition-all">
               <Search className="w-4 h-4 text-slate-400 mr-3" />
-              <input 
-                type="text" 
-                placeholder="Search accounts, CSMs, or tickets..." 
+              <input
+                type="text"
+                placeholder="Search accounts, CSMs, or tickets..."
                 className="bg-transparent border-none outline-none text-sm font-medium text-slate-600 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -445,7 +445,7 @@ function Dashboard() {
 
             <div className="flex items-center gap-4">
               <div className="relative">
-                <button 
+                <button
                   onClick={() => setShowNotifications(!showNotifications)}
                   className={`p-3 rounded-xl transition-all relative ${showNotifications ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
                 >
@@ -476,7 +476,7 @@ function Dashboard() {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex items-center gap-3 pl-4 border-l border-slate-100">
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-black text-slate-900 leading-none mb-1">{userName}</p>
@@ -484,22 +484,22 @@ function Dashboard() {
                 </div>
                 <div className="relative group">
                   <button className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-indigo-100 overflow-hidden">
-                    <img 
+                    <img
                       src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`}
-                      alt="Avatar" 
+                      alt="Avatar"
                       className="w-full h-full rounded-[14px] bg-white"
                     />
                   </button>
-                  
+
                   {/* Dropdown Menu */}
                   <div className="absolute right-0 mt-3 w-48 bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 p-2">
-                    <button 
+                    <button
                       onClick={() => setShowProfile(true)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                     >
                       <User className="w-4 h-4" /> Profile
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowSettings(true)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                     >
@@ -544,15 +544,14 @@ function Dashboard() {
                 ))
               ) : filteredAccounts.length > 0 ? (
                 filteredAccounts.map((acc) => (
-                  <div 
+                  <div
                     key={acc.id}
                     onClick={() => setSelectedAccountId(acc.id)}
-                    className={`w-full text-left p-5 rounded-2xl transition-all duration-300 border relative overflow-hidden group ${
-                      selectedAccountId === acc.id 
-                        ? 'bg-white border-indigo-400 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.15)] scale-[1.02] z-10' 
-                        : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md'
-                    }`}
-                    style={{cursor:'pointer'}}
+                    className={`w-full text-left p-5 rounded-2xl transition-all duration-300 border relative overflow-hidden group ${selectedAccountId === acc.id
+                      ? 'bg-white border-indigo-400 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.15)] scale-[1.02] z-10'
+                      : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-md'
+                      }`}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="flex justify-between items-start mb-2 relative z-10">
                       <div>
@@ -563,7 +562,7 @@ function Dashboard() {
                         <div className={`px-2 py-0.5 rounded-lg text-[9px] font-black border ${getTierColor(acc.risk_tier)}`}>
                           {acc.risk_tier}
                         </div>
-                        {acc.prev_risk_score !== null && acc.prev_risk_score !== undefined && acc.risk_score !== undefined && (
+                        {acc.prev_risk_score !== null && acc.prev_risk_score !== undefined && acc.risk_score !== undefined && acc.risk_score !== acc.prev_risk_score && (
                           <span style={{
                             fontSize: '9px', fontWeight: 800,
                             color: acc.risk_score > acc.prev_risk_score ? '#dc2626' : '#16a34a'
@@ -581,8 +580,12 @@ function Dashboard() {
                       {(() => {
                         if (acc.renewal_date) {
                           const days = Math.ceil((new Date(acc.renewal_date) - new Date()) / (1000 * 60 * 60 * 24));
-                          if (days >= 0 && days <= 30) {
+                          if (days < 0) {
+                            return <span style={{ fontSize: '9px', fontWeight: 800, background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '6px' }}>⚠️ Overdue {Math.abs(days)}d</span>;
+                          } else if (days <= 30) {
                             return <span style={{ fontSize: '9px', fontWeight: 800, background: '#fef2f2', color: '#dc2626', padding: '2px 8px', borderRadius: '6px' }}>🔴 Renewal in {days}d</span>;
+                          } else {
+                            return <span style={{ fontSize: '9px', fontWeight: 700, background: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: '6px' }}>📅 {acc.renewal_date.slice(0, 10)}</span>;
                           }
                         }
                         return null;
@@ -651,16 +654,18 @@ function Dashboard() {
             {accountDetails ? (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-6 duration-500">
                 {/* Stats Row */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                   {[
                     { label: 'Risk Score', val: accountDetails.risk_info.score, color: 'text-indigo-600' },
                     { label: 'Tenure', val: `${accountDetails.tenure}m`, color: 'text-slate-800' },
                     { label: 'Contract', val: accountDetails.contract_type, color: 'text-slate-800' },
                     { label: 'Value', val: `$${accountDetails.contract_value.toLocaleString()}`, color: 'text-emerald-600' },
+                    { label: 'Renewal Date', val: accountDetails.renewal_date ? String(accountDetails.renewal_date).slice(0, 10) : 'N/A', color: 'text-rose-600' },
+                    { label: 'Last Login', val: accountDetails.last_login_date ? String(accountDetails.last_login_date).slice(0, 10) : 'N/A', color: 'text-indigo-900' },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-white border border-slate-100 p-5 rounded-3xl shadow-sm">
+                    <div key={i} className="bg-white border border-slate-100 p-4 rounded-3xl shadow-sm">
                       <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">{stat.label}</p>
-                      <p className={`text-xl font-black ${stat.color}`}>{stat.val}</p>
+                      <p className={`text-base font-black ${stat.color} truncate`}>{stat.val}</p>
                     </div>
                   ))}
                 </div>
@@ -670,13 +675,12 @@ function Dashboard() {
                   <div className="bg-white border border-slate-100 rounded-3xl shadow-sm p-6">
                     <div className="flex items-center justify-between mb-4">
                       <p className="text-xs text-slate-400 font-black uppercase tracking-widest">Risk Factor Breakdown</p>
-                      <span className={`text-xs font-black px-3 py-1 rounded-full ${
-                        accountDetails.risk_info.tier === 'HIGH'
-                          ? 'bg-red-50 text-red-600'
-                          : accountDetails.risk_info.tier === 'MEDIUM'
+                      <span className={`text-xs font-black px-3 py-1 rounded-full ${accountDetails.risk_info.tier === 'HIGH'
+                        ? 'bg-red-50 text-red-600'
+                        : accountDetails.risk_info.tier === 'MEDIUM'
                           ? 'bg-amber-50 text-amber-600'
                           : 'bg-emerald-50 text-emerald-600'
-                      }`}>
+                        }`}>
                         {accountDetails.risk_info.tier} RISK — Score {accountDetails.risk_info.score}/100
                       </span>
                     </div>
@@ -685,13 +689,12 @@ function Dashboard() {
                     <div className="mb-5">
                       <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
                         <div
-                          className={`h-3 rounded-full transition-all duration-700 ${
-                            accountDetails.risk_info.score >= 70
-                              ? 'bg-gradient-to-r from-red-400 to-red-600'
-                              : accountDetails.risk_info.score >= 35
+                          className={`h-3 rounded-full transition-all duration-700 ${accountDetails.risk_info.score >= 70
+                            ? 'bg-gradient-to-r from-red-400 to-red-600'
+                            : accountDetails.risk_info.score >= 35
                               ? 'bg-gradient-to-r from-amber-400 to-amber-600'
                               : 'bg-gradient-to-r from-emerald-400 to-emerald-600'
-                          }`}
+                            }`}
                           style={{ width: `${accountDetails.risk_info.score}%` }}
                         />
                       </div>
@@ -707,13 +710,12 @@ function Dashboard() {
                         <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-3">Triggered Risk Factors</p>
                         {accountDetails.risk_info.reasons.map((reason, i) => (
                           <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                              accountDetails.risk_info.tier === 'HIGH'
-                                ? 'bg-red-500'
-                                : accountDetails.risk_info.tier === 'MEDIUM'
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${accountDetails.risk_info.tier === 'HIGH'
+                              ? 'bg-red-500'
+                              : accountDetails.risk_info.tier === 'MEDIUM'
                                 ? 'bg-amber-500'
                                 : 'bg-emerald-500'
-                            }`} />
+                              }`} />
                             <p className="text-sm text-slate-700 font-medium leading-snug">{reason}</p>
                           </div>
                         ))}
@@ -734,7 +736,7 @@ function Dashboard() {
                       <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
                       Behavioral Signals
                     </h3>
-                    
+
                     <div className="space-y-10">
                       <div>
                         <div className="flex justify-between text-sm mb-3">
@@ -742,7 +744,7 @@ function Dashboard() {
                           <span className="font-black text-indigo-600 text-lg">{accountDetails.usage_metrics[0]?.feature_adoption_pct.toFixed(0)}%</span>
                         </div>
                         <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                          <div 
+                          <div
                             className="h-full bg-gradient-to-r from-indigo-400 via-indigo-600 to-purple-600 transition-all duration-1000 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
                             style={{ width: `${accountDetails.usage_metrics[0]?.feature_adoption_pct}%` }}
                           ></div>
@@ -779,7 +781,7 @@ function Dashboard() {
                   {/* AI Agent Panel */}
                   <div className="bg-indigo-50/30 border border-indigo-100 rounded-[32px] p-8 shadow-sm flex flex-col relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full translate-x-10 -translate-y-10"></div>
-                    
+
                     <h3 className="text-sm font-black uppercase text-indigo-600 mb-8 flex items-center gap-2 relative z-10">
                       <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
                       AI Analysis Agent
@@ -795,7 +797,7 @@ function Dashboard() {
                         <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-[240px]">
                           Trigger the reasoning engine to synthesize behavioral signals into strategy.
                         </p>
-                        <button 
+                        <button
                           onClick={runAIAnalysis}
                           disabled={analyzing}
                           className="w-full py-5 bg-indigo-600 text-white rounded-3xl font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 disabled:opacity-50 active:scale-[0.98] text-sm uppercase tracking-widest"
@@ -823,7 +825,7 @@ function Dashboard() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div>
                           <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest mb-3">Prescribed Strategy</p>
                           <div className="flex items-center gap-4 p-5 bg-emerald-50 rounded-[24px] border border-emerald-100 text-emerald-700 font-black text-sm shadow-sm">
@@ -842,7 +844,7 @@ function Dashboard() {
                         <div>
                           <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-3">Generated Outreach</p>
                           <div className="relative group">
-                            <textarea 
+                            <textarea
                               className="w-full h-40 p-5 bg-slate-50 text-slate-600 text-[12px] rounded-3xl font-mono focus:ring-2 focus:ring-indigo-100 outline-none border border-slate-100 shadow-inner resize-none transition-all"
                               value={analysis.outreach_draft}
                               readOnly
@@ -853,7 +855,7 @@ function Dashboard() {
                           </div>
                         </div>
 
-                        <button 
+                        <button
                           onClick={handleApprove}
                           disabled={approving}
                           className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-[0.98] text-sm uppercase tracking-widest"
@@ -986,7 +988,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      
+
       <Chatbot selectedAccountId={selectedAccountId} />
 
       {/* Modals */}
@@ -996,32 +998,32 @@ function Dashboard() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Account ID</label>
-                <input required type="text" placeholder="ACC-001" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100" 
-                  value={newAcc.id} onChange={e => setNewAcc({...newAcc, id: e.target.value})} />
+                <input required type="text" placeholder="ACC-001" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100"
+                  value={newAcc.id} onChange={e => setNewAcc({ ...newAcc, id: e.target.value })} />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Client Name</label>
-                <input required type="text" placeholder="Acme Corp" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100" 
-                  value={newAcc.name} onChange={e => setNewAcc({...newAcc, name: e.target.value})} />
+                <input required type="text" placeholder="Acme Corp" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100"
+                  value={newAcc.name} onChange={e => setNewAcc({ ...newAcc, name: e.target.value })} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Monthly Charges ($)</label>
-                <input required type="number" placeholder="1200" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100" 
-                  value={newAcc.monthly_charges} onChange={e => setNewAcc({...newAcc, monthly_charges: e.target.value})} />
+                <input required type="number" placeholder="1200" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100"
+                  value={newAcc.monthly_charges} onChange={e => setNewAcc({ ...newAcc, monthly_charges: e.target.value })} />
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Tenure (Months)</label>
-                <input required type="number" placeholder="12" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100" 
-                  value={newAcc.tenure} onChange={e => setNewAcc({...newAcc, tenure: e.target.value})} />
+                <input required type="number" placeholder="12" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100"
+                  value={newAcc.tenure} onChange={e => setNewAcc({ ...newAcc, tenure: e.target.value })} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contract Type</label>
-                <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100" 
-                  value={newAcc.contract_type} onChange={e => setNewAcc({...newAcc, contract_type: e.target.value})}>
+                <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-100"
+                  value={newAcc.contract_type} onChange={e => setNewAcc({ ...newAcc, contract_type: e.target.value })}>
                   <option>Monthly</option>
                   <option>Annual</option>
                   <option>2-Year</option>
@@ -1029,7 +1031,7 @@ function Dashboard() {
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contract Value ($)</label>
-                <input readOnly type="number" placeholder="Calculated" className="w-full p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl outline-none text-indigo-600 font-bold" 
+                <input readOnly type="number" placeholder="Calculated" className="w-full p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl outline-none text-indigo-600 font-bold"
                   value={newAcc.contract_value} />
                 <p className="text-[9px] text-slate-400 font-medium italic mt-1">* Auto-calculated (Monthly × Tenure)</p>
               </div>
@@ -1050,8 +1052,8 @@ function Dashboard() {
               </div>
               <div className="flex-1">
                 {isEditingProfile ? (
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className="w-full px-4 py-2 bg-white border border-indigo-200 rounded-xl font-bold text-slate-900 outline-none ring-2 ring-indigo-50"
@@ -1067,7 +1069,7 @@ function Dashboard() {
                 </div>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="p-5 bg-white border border-slate-100 rounded-3xl">
                 <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Email</p>
@@ -1081,13 +1083,13 @@ function Dashboard() {
 
             {isEditingProfile ? (
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={() => setIsEditingProfile(false)}
                   className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black hover:bg-slate-200 transition-all"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleUpdateProfile}
                   className="flex-[2] py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
                 >
@@ -1095,7 +1097,7 @@ function Dashboard() {
                 </button>
               </div>
             ) : (
-              <button 
+              <button
                 onClick={() => { setIsEditingProfile(true); setEditName(userName); }}
                 className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
               >
@@ -1110,8 +1112,8 @@ function Dashboard() {
         <Modal title="System Settings" onClose={() => setShowSettings(false)}>
           <div className="space-y-4">
             {systemSettings.map((s) => (
-              <button 
-                key={s.id} 
+              <button
+                key={s.id}
                 onClick={() => toggleSetting(s.id)}
                 className="w-full flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl hover:border-indigo-200 transition-all group text-left"
               >
@@ -1120,7 +1122,7 @@ function Dashboard() {
                   <p className="text-xs text-slate-400 font-medium leading-tight">{s.desc}</p>
                 </div>
                 <div className={`w-12 h-6 rounded-full p-1 transition-colors pointer-events-none ${s.active ? 'bg-indigo-600' : 'bg-slate-200'}`}>
-                  <motion.div 
+                  <motion.div
                     initial={false}
                     animate={{ x: s.active ? 24 : 0 }}
                     className="w-4 h-4 bg-white rounded-full shadow-sm"
@@ -1128,8 +1130,8 @@ function Dashboard() {
                 </div>
               </button>
             ))}
-            
-            <button 
+
+            <button
               onClick={handleSaveSettings}
               disabled={isSavingSettings}
               className="w-full py-4 mt-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg shadow-slate-100 hover:bg-slate-800 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
@@ -1155,13 +1157,13 @@ function Dashboard() {
 function Modal({ title, children, onClose }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         onClick={onClose}
         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
       ></motion.div>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative w-full max-w-lg bg-white rounded-[48px] shadow-2xl border border-white p-10 overflow-hidden"
@@ -1178,7 +1180,7 @@ function Modal({ title, children, onClose }) {
 
 function TicketItem({ ticket }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const getSentimentIcon = (s) => {
     if (s === 'negative') return '💢';
     if (s === 'positive') return '🌟';
@@ -1186,11 +1188,10 @@ function TicketItem({ ticket }) {
   };
 
   return (
-    <div 
+    <div
       onClick={() => setIsExpanded(!isExpanded)}
-      className={`flex flex-col p-4 bg-white rounded-2xl border transition-all cursor-pointer ${
-        isExpanded ? 'border-indigo-400 shadow-md ring-4 ring-indigo-50' : 'border-slate-100 hover:border-slate-300'
-      }`}
+      className={`flex flex-col p-4 bg-white rounded-2xl border transition-all cursor-pointer ${isExpanded ? 'border-indigo-400 shadow-md ring-4 ring-indigo-50' : 'border-slate-100 hover:border-slate-300'
+        }`}
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 overflow-hidden">
@@ -1199,15 +1200,14 @@ function TicketItem({ ticket }) {
             {ticket.subject}
           </span>
         </div>
-        <span className={`flex-shrink-0 px-3 py-1 rounded-full font-black uppercase text-[10px] tracking-tighter border ${
-          ticket.sentiment === 'negative' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
-          ticket.sentiment === 'positive' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-          'bg-slate-50 text-slate-500 border-slate-200'
-        }`}>
+        <span className={`flex-shrink-0 px-3 py-1 rounded-full font-black uppercase text-[10px] tracking-tighter border ${ticket.sentiment === 'negative' ? 'bg-rose-50 text-rose-600 border-rose-100' :
+          ticket.sentiment === 'positive' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+            'bg-slate-50 text-slate-500 border-slate-200'
+          }`}>
           {ticket.sentiment}
         </span>
       </div>
-      
+
       {isExpanded && (
         <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 leading-relaxed animate-in fade-in slide-in-from-top-2">
           <p className="mb-2 font-black text-slate-400 uppercase tracking-widest text-[9px]">Expanded Transcript</p>

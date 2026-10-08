@@ -21,7 +21,7 @@ conn = sqlite3.connect("churn_ai_checkpoints.db", check_same_thread=False)
 memory = SqliteSaver(conn)
 
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     account_id: str
     account_data: dict
     risk_info: dict
@@ -34,6 +34,7 @@ class AgentState(TypedDict):
     chat_response: str
     hubspot_used: bool
     brief: dict
+    outcome: str
 
 import data_loader
 
@@ -262,6 +263,7 @@ def outcome_node(state: AgentState):
     Records agent analysis outcome: updates account status, saves to ChromaDB RAG,
     runs feedback loop with the rules that fired, and sets admin flag for high-risk churned accounts.
     """
+    outcome = state.get('outcome', '')
     risk_info = state.get('risk_info', {})
     tier = risk_info.get('tier', 'LOW')
     account_id = state.get('account_id', '')
@@ -269,56 +271,121 @@ def outcome_node(state: AgentState):
     fired_rules = risk_info.get('fired_rules', [])
     risk_reasons = risk_info.get('reasons', [])
 
-    print(f"[Outcome Node] Processing {account_name} — tier: {tier}")
+    print(f"[Outcome Node] Processing {account_name} ({account_id}) — outcome: '{outcome}', tier: {tier}")
 
-    # Update account status in SQLite
-    if tier in ['HIGH', 'MEDIUM']:
+    if outcome == 'churned':
         try:
             from database import SessionLocal
             from models import Account
             import datetime
             session = SessionLocal()
             acc = session.query(Account).filter_by(id=account_id).first()
-            if acc and acc.status == 'Active':
-                # Flag high-value HIGH risk accounts for admin review
-                if tier == 'HIGH':
-                    contract_value = state.get('account_data', {}).get('contract_value', 0)
-                    try:
-                        contract_value = float(contract_value)
-                    except (ValueError, TypeError):
-                        contract_value = 0
-                    if contract_value > 10000:
-                        acc.flagged_for_admin = True
-                        acc.flag_reason = f"Auto-flagged: HIGH risk account with ${contract_value:,.0f} contract value"
+            if acc:
+                acc.status = 'Churned'
+                acc.was_successful = False
+                acc.outcome_date = datetime.datetime.utcnow()
+                acc.flagged_for_admin = True
+                acc.flag_reason = "CSM-reported churn"
                 session.commit()
             session.close()
+            print(f"[Outcome Node] Marked {account_name} ({account_id}) as Churned in SQLite and flagged for admin.")
         except Exception as e:
-            print(f"[Outcome Node] SQLite update error: {e}")
+            print(f"[Outcome Node] SQLite update error for churned outcome: {e}")
 
-        # Save analysis to ChromaDB RAG for future similar-case retrieval
         try:
             from rag import add_outcome_to_rag
             add_outcome_to_rag(
                 account_id=account_id,
                 risk_reasons=risk_reasons,
-                outcome='at_risk',
-                csm_action=f"AI analysis completed — {tier} risk tier assigned"
+                outcome='churned',
+                csm_action="CSM reported churn outcome"
             )
+            print(f"[Outcome Node] Saved {account_name} ({account_id}) to ChromaDB RAG with outcome='churned'.")
         except Exception as e:
             print(f"[Outcome Node] RAG update error: {e}")
 
-        # Run feedback loop only for HIGH risk — strengthen signals that fired
-        if tier == 'HIGH' and fired_rules:
+        if fired_rules:
             try:
                 from feedback_loop import run_feedback_loop
                 run_feedback_loop(fired_rules=fired_rules)
-                print(f"[Outcome Node] Feedback loop updated {len(fired_rules)} rule weights.")
+                print(f"[Outcome Node] Feedback loop recalibrated for churned rules: {fired_rules}")
             except Exception as e:
                 print(f"[Outcome Node] Feedback loop error: {e}")
 
-        print(f"[Outcome Node] {account_name} — {tier} risk — queued for CSM review.")
+    elif outcome == 'renewed':
+        try:
+            from database import SessionLocal
+            from models import Account
+            import datetime
+            session = SessionLocal()
+            acc = session.query(Account).filter_by(id=account_id).first()
+            if acc:
+                acc.status = 'Renewed'
+                acc.was_successful = True
+                acc.outcome_date = datetime.datetime.utcnow()
+                session.commit()
+            session.close()
+            print(f"[Outcome Node] Marked {account_name} ({account_id}) as Renewed in SQLite.")
+        except Exception as e:
+            print(f"[Outcome Node] SQLite update error for renewed outcome: {e}")
+
+        try:
+            from rag import add_outcome_to_rag
+            add_outcome_to_rag(
+                account_id=account_id,
+                risk_reasons=risk_reasons,
+                outcome='renewed',
+                csm_action="CSM reported renewed outcome"
+            )
+            print(f"[Outcome Node] Saved {account_name} ({account_id}) to ChromaDB RAG with outcome='renewed'.")
+        except Exception as e:
+            print(f"[Outcome Node] RAG update error: {e}")
+
     else:
-        print(f"[Outcome Node] {account_name} is LOW risk. No immediate action needed.")
+        # outcome is empty — agent just finished analysis, no CSM decision yet
+        if tier in ['HIGH', 'MEDIUM']:
+            try:
+                from database import SessionLocal
+                from models import Account
+                session = SessionLocal()
+                acc = session.query(Account).filter_by(id=account_id).first()
+                if acc and acc.status == 'Active':
+                    if tier == 'HIGH':
+                        contract_value = state.get('account_data', {}).get('contract_value', 0)
+                        try:
+                            contract_value = float(contract_value)
+                        except (ValueError, TypeError):
+                            contract_value = 0
+                        if contract_value > 10000:
+                            acc.flagged_for_admin = True
+                            acc.flag_reason = f"Auto-flagged: HIGH risk account with ${contract_value:,.0f} contract value"
+                    session.commit()
+                session.close()
+            except Exception as e:
+                print(f"[Outcome Node] SQLite update error: {e}")
+
+            try:
+                from rag import add_outcome_to_rag
+                add_outcome_to_rag(
+                    account_id=account_id,
+                    risk_reasons=risk_reasons,
+                    outcome='at_risk',
+                    csm_action=f"AI analysis completed — {tier} risk tier assigned"
+                )
+            except Exception as e:
+                print(f"[Outcome Node] RAG update error: {e}")
+
+            if tier == 'HIGH' and fired_rules:
+                try:
+                    from feedback_loop import run_feedback_loop
+                    run_feedback_loop(fired_rules=fired_rules)
+                    print(f"[Outcome Node] Feedback loop updated {len(fired_rules)} rule weights.")
+                except Exception as e:
+                    print(f"[Outcome Node] Feedback loop error: {e}")
+
+            print(f"[Outcome Node] {account_name} — {tier} risk — queued for CSM review.")
+        else:
+            print(f"[Outcome Node] {account_name} is LOW risk. No immediate action needed.")
 
     return {}
 

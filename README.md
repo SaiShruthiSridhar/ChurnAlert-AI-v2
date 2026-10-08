@@ -2,6 +2,8 @@
 
 ChurnAlert AI is a full-stack agentic system that helps Customer Success Managers (CSMs) in SaaS companies identify customers who are about to cancel and take action to retain them. Every morning the system automatically checks all customer accounts, scores each one for churn risk, and for high-risk accounts the AI writes a personalized outreach message ready for the CSM to approve and send. The system also tracks whether each intervention worked and learns from the results over time.
 
+Demo project: all companies shown are sample data.
+
 ---
 
 ## Screenshots
@@ -46,9 +48,6 @@ ChurnAlert AI is a full-stack agentic system that helps Customer Success Manager
 ### ChromaDB — 1869 Kaggle IBM Telco Records
 ![ChromaDB Kaggle](Screenshots/chromadb_kaggle.png)
 
-### LangGraph Checkpointing — SQLite Verification
-![LangGraph Checkpoints](Screenshots/langraph_checkpoints.png)
-
 ### APScheduler — 6am and 6:30am Jobs
 ![APScheduler](Screenshots/apscheduler.png)
 
@@ -61,9 +60,9 @@ ChurnAlert AI is a full-stack agentic system that helps Customer Success Manager
 
 ## Features
 
-- **HubSpot MCP Integration** — Live CRM data from demo companies in a HubSpot test account via OAuth 2.1 with PKCE
+- **HubSpot MCP Integration** — Connects to HubSpot's MCP server using OAuth 2.1 with PKCE
 - **Dual Data Source** — Switch between HubSpot live data and CSV demo data from the dashboard
-- **6-Node LangGraph Agent** — Monitor → Score → Reason → Brief → Human Review → Outcome
+- **7-Node LangGraph Agent** — Monitor → Score → Retrieve → Reason → Brief → Human Review → Outcome
 - **Deterministic Rules Engine** — 13 configurable thresholds editable by Admin in real time
 - **ChromaDB RAG** — 1,869 real churn cases from IBM Telco Kaggle dataset power Similar Past Accounts
 - **LangSmith Observability** — Every AI decision recorded and auditable
@@ -87,7 +86,7 @@ ChurnAlert AI/
 │
 ├── backend/                            # Flask Python backend
 │   ├── app.py                          # Main Flask app — 24 REST endpoints
-│   ├── agent.py                        # LangGraph 6-node StateGraph
+│   ├── agent.py                        # LangGraph 7-node StateGraph
 │   ├── rules_engine.py                 # Deterministic risk scoring engine
 │   ├── mcp_client.py                   # HubSpot MCP integration
 │   ├── rag.py                          # ChromaDB RAG — similar past accounts
